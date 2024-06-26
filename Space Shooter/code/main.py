@@ -16,7 +16,6 @@ class Player(pygame.sprite.Sprite):
         if not self.can_shoot:
             current_time = pygame.time.get_ticks()
             if self.laser_shoot_time + self.cooldown_duration <= current_time:
-                print('Refreshed!')
                 self.can_shoot = True 
 
     def update(self, delta):
@@ -29,7 +28,7 @@ class Player(pygame.sprite.Sprite):
 
         key = pygame.key.get_just_pressed()
         if key[pygame.K_SPACE] and self.can_shoot:
-            print("Shooting Laser!")
+            Laser(laser_surf, self.rect.midtop, all_sprites)
             self.can_shoot = False 
             self.laser_shoot_time = pygame.time.get_ticks()
 
@@ -41,6 +40,17 @@ class Star(pygame.sprite.Sprite):
         self.height = 720
         self.image = surf 
         self.rect = self.image.get_frect(center=(randint(0, self.width), randint(0, self.height)))
+class Laser(pygame.sprite.Sprite):
+    def __init__(self, surf, pos, group):
+        super().__init__(group)
+        self.image = surf
+        self.rect = self.image.get_frect(midbottom=pos)
+
+    def update(self, dt):
+        self.rect.centery -= 400 * dt 
+        if self.rect.bottom < 0:
+            self.kill()
+
 
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
@@ -60,13 +70,12 @@ meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
 meteor_rect = meteor_surf.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
 
 laser_surf = pygame.image.load('../images/laser.png').convert_alpha()
-laser_rect = laser_surf.get_frect(bottomleft=(20, WINDOW_HEIGHT- 20))
 
 meteor_event = pygame.event.custom_type()
 pygame.time.set_timer(meteor_event, 500)
 
 while running:
-    dt = clock.tick() / 1000
+    dt = clock.tick(10) / 1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False 
