@@ -1,6 +1,5 @@
 import pygame 
 from random import randint
-
 class Player(pygame.sprite.Sprite):
     def __init__(self, group):
         super().__init__(group)
@@ -8,6 +7,17 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
         self.direction = pygame.math.Vector2()
         self.speed = 300
+        
+        self.can_shoot = True 
+        self.laser_shoot_time = 0
+        self.cooldown_duration = 400 
+
+    def laser_timer(self):
+        if not self.can_shoot:
+            current_time = pygame.time.get_ticks()
+            if self.laser_shoot_time + self.cooldown_duration <= current_time:
+                print('Refreshed!')
+                self.can_shoot = True 
 
     def update(self, delta):
         keys = pygame.key.get_pressed()
@@ -18,15 +28,18 @@ class Player(pygame.sprite.Sprite):
         self.rect.center += self.direction * delta * self.speed
 
         key = pygame.key.get_just_pressed()
-        if key[pygame.K_SPACE]:
+        if key[pygame.K_SPACE] and self.can_shoot:
             print("Shooting Laser!")
+            self.can_shoot = False 
+            self.laser_shoot_time = pygame.time.get_ticks()
 
+        self.laser_timer()
 class Star(pygame.sprite.Sprite):
-    def __init__(self, group):
+    def __init__(self, group, surf):
         super().__init__(group)
         self.width = 1280
         self.height = 720
-        self.image = pygame.image.load('../images/star.png').convert_alpha() 
+        self.image = surf 
         self.rect = self.image.get_frect(center=(randint(0, self.width), randint(0, self.height)))
 
 pygame.init()
@@ -36,10 +49,11 @@ pygame.display.set_caption('Space Shooter')
 running = True 
 clock = pygame.time.Clock()
 
-
 all_sprites = pygame.sprite.Group()
-stars = [Star(all_sprites) for time in range(20)]
-all_sprites.add(stars)
+
+star_surface = pygame.image.load('../images/star.png').convert_alpha() 
+for time in range(20):
+    Star(all_sprites, star_surface)
 player = Player(all_sprites)
 
 meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
@@ -48,18 +62,22 @@ meteor_rect = meteor_surf.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
 laser_surf = pygame.image.load('../images/laser.png').convert_alpha()
 laser_rect = laser_surf.get_frect(bottomleft=(20, WINDOW_HEIGHT- 20))
 
+meteor_event = pygame.event.custom_type()
+pygame.time.set_timer(meteor_event, 500)
+
 while running:
     dt = clock.tick() / 1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False 
+        #if event.type == meteor_event:
+        #    print('crate meteor')
 
     display_surface.fill(color='darkgray')
 
     all_sprites.update(dt)
     all_sprites.draw(display_surface)
     
-
     pygame.display.update()
 
 pygame.quit()
