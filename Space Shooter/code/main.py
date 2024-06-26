@@ -21,6 +21,13 @@ class Player(pygame.sprite.Sprite):
         if key[pygame.K_SPACE]:
             print("Shooting Laser!")
 
+class Star(pygame.sprite.Sprite):
+    def __init__(self, group):
+        super().__init__(group)
+        self.width = 1280
+        self.height = 720
+        self.image = pygame.image.load('../images/star.png').convert_alpha() 
+        self.rect = self.image.get_frect(center=(randint(0, self.width), randint(0, self.height)))
 
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
@@ -29,11 +36,11 @@ pygame.display.set_caption('Space Shooter')
 running = True 
 clock = pygame.time.Clock()
 
-all_sprites = pygame.sprite.Group()
-player = Player(all_sprites)
 
-star_surf = pygame.image.load('../images/star.png').convert_alpha()
-star_positions = [(randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)) for time in range(20)]
+all_sprites = pygame.sprite.Group()
+stars = [Star(all_sprites) for time in range(20)]
+all_sprites.add(stars)
+player = Player(all_sprites)
 
 meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
 meteor_rect = meteor_surf.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
@@ -48,8 +55,6 @@ while running:
             running = False 
 
     display_surface.fill(color='darkgray')
-    for position in star_positions:
-        display_surface.blit(star_surf, position)
 
     all_sprites.update(dt)
     all_sprites.draw(display_surface)
