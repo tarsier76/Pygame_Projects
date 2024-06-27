@@ -50,7 +50,14 @@ class Laser(pygame.sprite.Sprite):
         self.rect.centery -= 400 * dt 
         if self.rect.bottom < 0:
             self.kill()
-
+class Meteor(pygame.sprite.Sprite):
+    def __init__(self, surf, pos, group):
+        super().__init__(group)
+        self.image = surf 
+        self.rect = self.image.get_frect(center=pos)
+        
+    def update(self, dt):
+        self.rect.centery += 400 * dt 
 
 pygame.init()
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280, 720
@@ -59,29 +66,27 @@ pygame.display.set_caption('Space Shooter')
 running = True 
 clock = pygame.time.Clock()
 
-all_sprites = pygame.sprite.Group()
+star_surface = pygame.image.load('../images/star.png').convert_alpha()
+meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
+laser_surf = pygame.image.load('../images/laser.png').convert_alpha() 
 
-star_surface = pygame.image.load('../images/star.png').convert_alpha() 
+all_sprites = pygame.sprite.Group()
 for time in range(20):
     Star(all_sprites, star_surface)
 player = Player(all_sprites)
 
-meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
-meteor_rect = meteor_surf.get_frect(center=(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
-
-laser_surf = pygame.image.load('../images/laser.png').convert_alpha()
-
 meteor_event = pygame.event.custom_type()
-pygame.time.set_timer(meteor_event, 500)
+pygame.time.set_timer(meteor_event, 100)
 
 while running:
-    dt = clock.tick(10) / 1000
+    dt = clock.tick() / 1000
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False 
-        #if event.type == meteor_event:
-        #    print('crate meteor')
-
+        if event.type == meteor_event:
+            x, y = randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT)
+            Meteor(meteor_surf, (x,y), all_sprites)
+            
     display_surface.fill(color='darkgray')
 
     all_sprites.update(dt)
