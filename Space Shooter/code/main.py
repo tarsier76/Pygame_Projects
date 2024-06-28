@@ -72,6 +72,21 @@ class Meteor(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.start_time >= self.delay:
             self.kill()
 
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, group, explosions_images, pos):
+        super().__init__(group)
+        self.explosions = explosions_images
+        self.frame_index = 0 
+        self.image = self.explosions[self.frame_index]
+        self.rect = self.image.get_frect(center=pos)
+
+    def update(self, dt):
+        self.frame_index += 20 * dt
+        if self.frame_index < len(self.explosions):
+            self.image = self.explosions[int(self.frame_index) % len(self.explosions)]
+        else:
+            self.kill()
+
 def collisions():
     global running
     if pygame.sprite.spritecollide(player, meteor_sprites, True, pygame.sprite.collide_mask):
@@ -79,6 +94,7 @@ def collisions():
     for laser in laser_sprites:
         if pygame.sprite.spritecollide(laser, meteor_sprites, True):
             laser.kill()
+            Explosion(all_sprites, explosions_list, laser.rect.midtop)
 
 def display_score():
     current_time = pygame.time.get_ticks() // 10
@@ -97,7 +113,9 @@ clock = pygame.time.Clock()
 star_surface = pygame.image.load('../images/star.png').convert_alpha()
 meteor_surf = pygame.image.load('../images/meteor.png').convert_alpha()
 laser_surf = pygame.image.load('../images/laser.png').convert_alpha() 
+explosions_list = [pygame.image.load(f'../images/explosion/{number}.png').convert_alpha() for number in range(21)]
 font = pygame.font.Font('../images/Oxanium-Bold.ttf', 40)
+
 
 all_sprites = pygame.sprite.Group()
 meteor_sprites = pygame.sprite.Group()
@@ -108,6 +126,7 @@ player = Player(all_sprites)
 
 meteor_event = pygame.event.custom_type()
 pygame.time.set_timer(meteor_event, 400)
+
 
 while running:
     dt = clock.tick() / 1000
