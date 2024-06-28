@@ -66,7 +66,9 @@ class Meteor(pygame.sprite.Sprite):
             self.kill()
 
 def collisions():
-    pygame.sprite.spritecollide(player, meteor_sprites, True)
+    global running
+    if pygame.sprite.spritecollide(player, meteor_sprites, True):
+        running = False
     pygame.sprite.groupcollide(laser_sprites, meteor_sprites, True, True)
 
 pygame.init()
