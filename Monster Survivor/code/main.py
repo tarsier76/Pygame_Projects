@@ -1,5 +1,5 @@
 from settings import * 
-from player import * 
+from player import Player
 
 class Game:
     def __init__(self):
@@ -8,8 +8,9 @@ class Game:
         self.title = pygame.display.set_caption('Monster Survivor')
         self.running = True 
         self.clock = pygame.time.Clock()
-        self.player = Player(all_sprites, (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
-
+        self.all_sprites = pygame.sprite.Group()
+        self.player = Player(self.all_sprites, (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2))
+        
     def run(self):
         while self.running:
             dt = self.clock.tick() / 1000
@@ -19,13 +20,11 @@ class Game:
 
             self.display.fill('gray')
             
-            all_sprites.update(dt)
-            all_sprites.draw(self.display)
+            self.all_sprites.update(dt)
+            self.all_sprites.draw(self.display)
             
             pygame.display.update()
         pygame.quit()
-
-all_sprites = pygame.sprite.Group()
 
 if __name__ == '__main__':
     Game().run()
