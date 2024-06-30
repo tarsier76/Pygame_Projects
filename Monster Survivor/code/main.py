@@ -15,7 +15,7 @@ class Game:
         self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         self.setup()
-        self.player = Player(self.all_sprites, (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 25), self.collision_sprites)
+        
 
     def setup(self):
         map = load_pygame('../data/maps/world.tmx')
@@ -29,6 +29,10 @@ class Game:
             img = pygame.Surface((obj.width, obj.height))
             img.set_colorkey('black')
             CollisionSprite((obj.x, obj.y), img, (self.all_sprites, self.collision_sprites))
+
+        for obj in map.get_layer_by_name('Entities'):
+            if obj.name == 'Player':
+                self.player = Player(self.all_sprites, (obj.x, obj.y), self.collision_sprites)
     
     def run(self):
         while self.running:
