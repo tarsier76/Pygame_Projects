@@ -3,6 +3,7 @@ from player import Player
 from sprites import * 
 from random import randint 
 from pytmx.util_pygame import load_pygame
+from groups import AllSprites
 
 class Game:
     def __init__(self):
@@ -11,7 +12,7 @@ class Game:
         self.title = pygame.display.set_caption('Monster Survivor')
         self.running = True 
         self.clock = pygame.time.Clock()
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = AllSprites()
         self.collision_sprites = pygame.sprite.Group()
         self.setup()
         self.player = Player(self.all_sprites, (WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 25), self.collision_sprites)
@@ -39,7 +40,7 @@ class Game:
             self.display.fill('black')
             
             self.all_sprites.update(dt)
-            self.all_sprites.draw(self.display)
+            self.all_sprites.draw(self.player.rect.center)
             
             pygame.display.update()
         pygame.quit()
