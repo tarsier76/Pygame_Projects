@@ -31,9 +31,7 @@ class Gun(pygame.sprite.Sprite):
         self.player_direction = (mouse_pos - player_pos).normalize()
 
     def rotate_gun(self):
-        angle = degrees(atan2(self.player_direction.x, self.player_direction.y)) - 90 
-        print(self.player_direction.x, self.player_direction.y)
-        print(angle)
+        angle = degrees(atan2(self.player_direction.x, self.player_direction.y)) - 90
         if self.player_direction.x > 0:
             self.image = pygame.transform.rotozoom(self.gun_surf, angle, 1)
         else:
@@ -45,4 +43,9 @@ class Gun(pygame.sprite.Sprite):
         self.rotate_gun()
         self.rect.center = self.player.rect.center + self.player_direction * self.distance
 
-
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, surf, pos, direction, groups):
+        super().__init__(groups)
+        self.image = surf 
+        self.rect = self.image.get_frect(center=pos)
+        
